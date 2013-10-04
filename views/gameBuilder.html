@@ -1,0 +1,59 @@
+<div ng-controller="GameBuilder" class="builder row">
+
+	<div class="col-sm-3 col-md-2 toolbox tool-container" ng-controller="navCtrl">
+		<div class="well well-sm" ng-show="!navShow('default',3)">
+			<div class="tool" ng-show="navShow('cardTypes',3)" ng-repeat="(toolId, tool) in toolbox.cardTypeTools" ng-class="tool.color" gb-draggable="toolId">
+				<div>{{tool.name}}</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-6 col-md-8 workspace" ng-controller="navCtrl">
+		<h3>{{gameName()}}</h3>
+		<div ng-show="navShow('default',3)">
+			<form role="form" ng-submit="save()">
+			  <div class="form-group" ng-class="{'has-error': input.invalidNameReason}">
+			    <label class="control-label" for="gameBuilder.Overview.GameName">Game Name</label>
+			    <input type="text" ng-model="currentGame.name" class="form-control" id="gameBuilder.Overview.GameName" placeholder="Enter Unique Game Name">
+			    <span class="help-block" ng-show="input.invalidNameReason">{{input.invalidNameReason}}</span>
+			  </div>
+			</form>
+		</div><div ng-show="navShow('cardTypes',3)" ng-controller="cardTypes" class="dropzone tool-container" gb-droppable>
+			<div class="tool" ng-repeat="cardType in currentGame.cardTypes" ng-class="[cardType.proto.color,getSelectedCardType($index),jsPlumbHook($index)]" id="jsPlumbElement-{{$index}}" gb-droppable="$index" gb-draggable="$index" gb-draggable-click="selectCardType($index)">
+				<div>
+					<span>{{getCardTypeHeader($index)}}</span>
+				</div>
+			</div>
+			<div ng-show="currentCardType" class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">{{getCardTypeHeader()}}</h3>
+				</div>
+				<div class="panel-body">
+					<form role="form" ng-submit="addCardType()">
+						<div class="form-group">
+							<label class="control-label" for="gameBuilder.Overview.GameName">Card Type Name</label>
+							<input type="text" ng-model="currentCardType.name" class="form-control" placeholder="Unique card type i.e. Land, Energy" required>
+						</div>
+						<div class="form-group">
+							<label class="control-label" for="gameBuilder.Overview.GameName">Card Type Name</label>
+							<input type="text" ng-model="currentCardType.name" class="form-control" required>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div><div ng-show="navShow('deckRules',3)">
+			deck rules
+		</div><div ng-show="navShow('gameRules',3)">
+			game rules
+		</div>
+	</div>
+	<div class="col-sm-3 col-md-2 rules">
+		<div ng-controller="navCtrl" class="list-group">
+			<a ng-class="navClass('default',3)"   class="list-group-item" href="#/gameBuilder/{{gid}}/">Overview</a>
+			<a ng-class="navClass('cardTypes',3)" class="list-group-item" href="#/gameBuilder/{{gid}}/cardTypes/">Card Types</a>
+			<a ng-class="navClass('deckRules',3)" class="list-group-item" href="#/gameBuilder/{{gid}}/deckRules/">Deck Rules</a>
+			<a ng-class="navClass('gameRules',3)" class="list-group-item" href="#/gameBuilder/{{gid}}/gameRules/">Game Rules</a>
+		</div>
+		<button type="button" ng-class="{disabled: !input.unsaved}" ng-click="save()" class="btn btn-primary pull-right save"><span class="glyphicon glyphicon-floppy-save"></span></button>
+	</div>
+</div>
