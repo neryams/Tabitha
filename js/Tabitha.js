@@ -5,10 +5,17 @@ Tabitha.controller('Main', ['$scope', function($scope) {
     $scope.defaults = {};
     $scope.defaults.defaultCardType = function() {
         this.fields = [];
+        this.ui = angular.copy(this.ui);
     };
     $scope.defaults.defaultCardType.prototype = {
         name: '',
-        parent: null
+        parent: null,
+        ui: {
+            position: {
+                x: 0,
+                y: 0
+            }
+        }
     }
     $scope.defaults.defaultGame = function() {
         this.cardTypes = [];
@@ -47,9 +54,9 @@ Tabitha.config(function($routeProvider, $controllerProvider, $compileProvider, $
             dependencies: [
                 'js/controllers/gameBuilder.js',
                 'js/controllers/gameBuilder.cardTypes.js',
-                'js/directives/dragDrop.js',
                 'js/third-party/jquery.jsPlumb-1.5.2-min.js',
-                'js/services/jsPlumbService.js'
+                'js/services/jsPlumbService.js',
+                'js/directives/dragDrop.js'
             ]
         },
         {

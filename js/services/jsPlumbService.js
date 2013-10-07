@@ -1,6 +1,69 @@
 angular.module('tabitha').provide.factory('jsPlumbService', function() {
+	var plumbTypes = {
+		cardType: {
+			sourceAnchors: ["BottomCenter"], 
+			targetAnchors: ["TopCenter"]
+		}
+	},
+	// this is the paint style for the connecting lines..
+	connectorPaintStyle = {
+		lineWidth:4,
+		strokeStyle:"#deea18",
+		joinstyle:"round",
+		outlineColor:"#eaedef",
+		outlineWidth:2
+	},
+	// .. and this is the hover style. 
+	connectorHoverStyle = {
+		lineWidth:4,
+		strokeStyle:"#5C96BC",
+		outlineWidth:2,
+		outlineColor:"white"
+	},
+	endpointHoverStyle = {fillStyle:"#FF0000"},
+	// the definition of source endpoints (the small blue ones)
+	sourceEndpoint = {
+		endpoint:"Dot",
+		paintStyle:{ 
+			strokeStyle:"#000000",
+			fillStyle:"transparent",
+			fillStyle:"#D10000",
+			radius:7,
+			lineWidth:2 
+		},				
+		isSource:true,
+		connector:[ "Flowchart", { stub:[40, 60], gap:10, cornerRadius:5, alwaysRespectStubs:true } ],								                
+		connectorStyle:connectorPaintStyle,
+		hoverPaintStyle:endpointHoverStyle,
+		connectorHoverStyle:connectorHoverStyle,
+        dragOptions:{},
+        overlays:[
+        	[ "Label", { 
+            	location:[0.5, 1.5], 
+            	label:"",
+            	cssClass:"endpointSourceLabel" 
+            } ]
+        ]
+	},
+	// the definition of target endpoints (will appear when the user drags a connection) 
+	targetEndpoint = {
+		endpoint:"Dot",					
+		paintStyle:{ fillStyle:"#D10000",radius:9 },
+		hoverPaintStyle:endpointHoverStyle,
+		maxConnections:-1,
+		dropOptions:{ hoverClass:"hover", activeClass:"active" },
+		isTarget:true,			
+        overlays:[
+        	[ "Label", { 
+        		location:[0.5, -0.5], 
+        		label:"Inherit From", 
+        		cssClass:"endpointTargetLabel" 
+        	} ]
+        ]
+	}
+
 	return {
-		create: function() {
+		setDefaults: function() {
 			jsPlumb.importDefaults({
 				Endpoint : ["Dot", { radius: 1 }],
 				HoverPaintStyle : {strokeStyle:"#1e8151", lineWidth:2 },
@@ -17,31 +80,22 @@ angular.module('tabitha').provide.factory('jsPlumbService', function() {
 				PaintStyle : { fillStyle:"blue", lineWidth : 2, strokeStyle : "#aaa" }
 			});
 		},
-		redrawRelationships: function() {
-			jsPlumb.deleteEveryEndpoint();
-			var elements = $(".jsPlumbElement");
-			$(".jsPlumbElement").each(function() {
-				var classes = $(this).attr('class').split(" "),
-					link = false;
+		activate: function(selector, plumbType) {
+			var terminus = plumbTypes[plumbType]
 
-				for (var j = 0; j < classes.length; j++) {
-					if(classes[j].substring(0,11) == 'jsPlumbLink')
-						link = classes[j].substring(12);
-				}
-				if(link !== false) {
-					jsPlumb.connect({
-						source: 'jsPlumbElement-'+link,  // just pass in the current node in the selector for source 
-						target: $(this).attr('id'),
-						// here we supply a different anchor for source and for target, and we get the element's "data-shape"
-						// attribute to tell us what shape we should use, as well as, optionally, a rotation value.
-						anchors:[
-							[ "Perimeter", { shape: 'Rectangle' }],
-							[ "Perimeter", { shape: 'Rectangle' }]
-						]
-					});						
-				}
+			for (var i = 0; i < terminus.sourceAnchors.length; i++) {
+				var sourceUUID = selector + terminus.sourceAnchors[i];
+				jsPlumb.addEndpoint(selector, sourceEndpoint, { anchor:terminus.sourceAnchors[i], uuid:sourceUUID });						
+			}
+			for (var j = 0; j < terminus.targetAnchors.length; j++) {
+				var targetUUID = selector + terminus.targetAnchors[j];
+				jsPlumb.addEndpoint(selector, targetEndpoint, { anchor:terminus.targetAnchors[j], uuid:targetUUID });						
+			}
 
-			});
+			jsPlumb.draggable($('#'+selector), { grid: [20, 20] });
+		},
+		refresh: function() {
+			jsPlumb.repaintEverything();
 		}
 	}
 });

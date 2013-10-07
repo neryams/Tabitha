@@ -9,13 +9,8 @@ angular.module('tabitha').compileProvider.directive('gbDraggable', function($par
                     revert: 'invalid',
                     helper: "clone"
                 });
-            // Dragging off of workspace
-            else 
-                element.draggable({
-                    revert: true,
-                    revertDuration: 100
-                });
             element.data('dragId', toolId);
+            element.data('gbDraggable', true);
         }
     };
 });
@@ -26,6 +21,11 @@ angular.module('tabitha').compileProvider.directive('gbDroppable', function($par
             var options = {
                 tolerance: 'intersect',
                 hoverClass: 'drop-hover',
+                accept: function(drag) { 
+                    if(angular.element(drag).data('gbDraggable')) { 
+                        return true;
+                    }
+                },
                 over: function(event, ui) {
                     $(this).parents('.ui-droppable').addClass('child-drop-hover');
                 },
@@ -42,17 +42,16 @@ angular.module('tabitha').compileProvider.directive('gbDroppable', function($par
                         if(isNaN(dragid)) {
                         // New cardType being dragged
                             var selectedCardType = drop.scope().addNewCard(dragid);
-                        } else {
-                        // Existing card type being dragged
-                            var selectedCardType = drag.scope().currentGame.cardTypes[+dragid];
                         }
 
                         if(isNaN(dropid)) {
                         // Dropped onto the background
                             selectedCardType.setCardParent();
-                        } else {
-                            selectedCardType.setCardParent(+dropid);
                         }
+
+                        var dropPosition = drop.offset();
+                        selectedCardType.ui.position.x = Math.round((ui.offset.left - dropPosition.left)/20)*20;
+                        selectedCardType.ui.position.y = Math.round((ui.offset.top - dropPosition.top)/20)*20;
 
                         drop.scope().$apply();
                     }
@@ -76,3 +75,18 @@ angular.module('tabitha').compileProvider.directive('gbDraggableClick', function
         }
     }
 });
+angular.module('tabitha').compileProvider.directive('gbJsplumb', ['$timeout','jsPlumbService', function($timeout,jsPlumbService) {
+    return {
+        // A = attribute, E = Element, C = Class and M = HTML Comment
+        link: function(scope, element, attrs) {
+            var elemId = 'jsPlumbElement-'+scope.$eval(attrs.gbJsplumb);
+            element.attr('id', elemId);
+
+            // Redraw jsPlumb when the parents change. Timeout so that it updates the angular stuff first.
+            $timeout(function() {
+                jsPlumbService.activate(elemId, 'cardType');
+            });
+            
+        }
+    }
+}]);

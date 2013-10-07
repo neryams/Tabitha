@@ -19,7 +19,7 @@
 			  </div>
 			</form>
 		</div><div ng-show="navShow('cardTypes',3)" ng-controller="cardTypes" class="dropzone tool-container" gb-droppable>
-			<div class="tool" ng-repeat="cardType in currentGame.cardTypes" ng-class="[cardType.proto.color,getSelectedCardType($index),jsPlumbHook($index)]" id="jsPlumbElement-{{$index}}" gb-droppable="$index" gb-draggable="$index" gb-draggable-click="selectCardType($index)">
+			<div class="tool" ng-repeat="cardType in currentGame.cardTypes" ng-class="[cardType.proto.color,cardTypeIsSelected($index)]" gb-jsplumb="$index" ng-click="selectCardType($index)" ng-style="getCardTypePosition($index)">
 				<div>
 					<span>{{getCardTypeHeader($index)}}</span>
 				</div>

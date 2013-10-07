@@ -1,18 +1,14 @@
 angular.module('tabitha').controllerProvider.register('cardTypes', ['$scope', '$timeout', 'jsPlumbService', function($scope, $timeout, jsPlumbService) {
 	$scope.currentCardType = null;
 	$scope.jsPlumb = jsPlumbService;
-	jsPlumbService.create();
+	jsPlumbService.setDefaults();
+
 	$scope.defaults.defaultCardType.prototype.setCardParent = function(index) {
         if(index === undefined)
             this.parent = null;
         else 
             this.parent = index;
 
-        // Redraw jsPlumb when the parents change. Timeout so that it updates the angular stuff first.
-        $timeout(function() {
-        	$scope.jsPlumb.redrawRelationships();
-        });
-        
         return this;
     };
 
@@ -28,15 +24,21 @@ angular.module('tabitha').controllerProvider.register('cardTypes', ['$scope', '$
 		else
 			return currentCardType.name;
 	}
-	$scope.getSelectedCardType = function(index) {
+	$scope.cardTypeIsSelected = function(index) {
 		if($scope.currentGame.cardTypes[index] == $scope.currentCardType)
 			return 'selected';
 		else
 			return '';
 	}
+	$scope.getCardTypePosition = function(index) {
+		return {
+			left: $scope.currentGame.cardTypes[index].ui.position.x,
+			top: $scope.currentGame.cardTypes[index].ui.position.y
+		}
+	}
+
 	$scope.selectCardType = function(index) {
 		$scope.currentCardType = $scope.currentGame.cardTypes[index];
-		$scope.$apply();
 	}
 	$scope.addNewCard = function(tool) {
 		$scope.currentCardType = new $scope.defaults.defaultCardType();
@@ -47,16 +49,9 @@ angular.module('tabitha').controllerProvider.register('cardTypes', ['$scope', '$
         return $scope.currentCardType;
 	}
 
-    $scope.jsPlumbHook = function(index) {
-        if($scope.currentGame.cardTypes[index]) {
-        	if($scope.currentGame.cardTypes[index].parent !== null)
-            	return 'jsPlumbElement jsPlumbLink-'+$scope.currentGame.cardTypes[index].parent;
-            else 
-            	return 'jsPlumbElement';
-        }
-        else
-            return '';
-    }
+	$scope.$watch('currentGame.cardTypes', function() {
+		$scope.jsPlumb.refresh();
+	})
 
 	var commonFields = [
 		{

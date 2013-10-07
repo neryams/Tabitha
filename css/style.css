@@ -82,7 +82,7 @@ body {
 		border-width: 1px;
 		margin-bottom: 10px;
 		width: 120px;
-
+		cursor: default;
 	}
 	#main>div.builder .toolbox .tool.ui-draggable-dragging {
 		z-index:15;
@@ -117,12 +117,22 @@ body {
 	#main>div.builder .workspace .dropzone.drop-hover.child-drop-hover {
 		background: none;
 	}
+	#main>div.builder .workspace .tool {
+		position: absolute;
+		border-width: 2px;
+		border-style: solid;
+		cursor: default;
+	}
 	#main>div.builder .workspace .tool.drop-hover {
 		background-image: url('../img/bg_drop.png');
 	}
 	#main>div.builder .workspace .tool.selected {
 		border: 2px solid #000;
 	}
-	#main>div.builder .workspace .tool.selected>div {
-		padding: 8px;
+
+	._jsPlumb_endpoint.active {
+		border: 1px dotted black;
+	}
+	._jsPlumb_endpoint.hover {
+		border: 1px dotted red;s
 	}
