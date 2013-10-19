@@ -1,9 +1,6 @@
 angular.module('tabitha').provide.factory('jsPlumbService', function() {
-	var plumbTypes = {
-		cardType: {
-			sourceAnchors: ["BottomCenter"], 
-			targetAnchors: ["TopCenter"]
-		}
+	var defaultType = '',
+	plumbTypes = {
 	},
 	// this is the paint style for the connecting lines..
 	connectorPaintStyle = {
@@ -63,7 +60,7 @@ angular.module('tabitha').provide.factory('jsPlumbService', function() {
 	}
 
 	return {
-		setDefaults: function() {
+		setDefaults: function(defaultTypeSet, moduleTypes) {
 			jsPlumb.importDefaults({
 				Endpoint : ["Dot", { radius: 1 }],
 				HoverPaintStyle : {strokeStyle:"#1e8151", lineWidth:2 },
@@ -79,17 +76,29 @@ angular.module('tabitha').provide.factory('jsPlumbService', function() {
 				Connector : "Straight",
 				PaintStyle : { fillStyle:"blue", lineWidth : 2, strokeStyle : "#aaa" }
 			});
+			jsPlumb.bind("connection", function(info) {
+				console.log(info);
+			});
+
+
+			$.each(moduleTypes, function(id, value) {
+				plumbTypes[id] = value;
+			});
+			defaultType = defaultTypeSet;
 		},
 		activate: function(selector, plumbType) {
-			var terminus = plumbTypes[plumbType]
+			if(plumbType)
+				var terminus = plumbTypes[plumbType];
+			else
+				var terminus = plumbTypes[defaultType];
 
 			for (var i = 0; i < terminus.sourceAnchors.length; i++) {
-				var sourceUUID = selector + terminus.sourceAnchors[i];
-				jsPlumb.addEndpoint(selector, sourceEndpoint, { anchor:terminus.sourceAnchors[i], uuid:sourceUUID });						
+				var sourceUUID = selector + terminus.sourceAnchors[i].placement;
+				jsPlumb.addEndpoint(selector, sourceEndpoint, { anchor:terminus.sourceAnchors[i].placement, uuid:sourceUUID });						
 			}
 			for (var j = 0; j < terminus.targetAnchors.length; j++) {
-				var targetUUID = selector + terminus.targetAnchors[j];
-				jsPlumb.addEndpoint(selector, targetEndpoint, { anchor:terminus.targetAnchors[j], uuid:targetUUID });						
+				var targetUUID = selector + terminus.targetAnchors[j].placement;
+				jsPlumb.addEndpoint(selector, targetEndpoint, { anchor:terminus.targetAnchors[j].placement, uuid:targetUUID });						
 			}
 
 			jsPlumb.draggable($('#'+selector), { grid: [20, 20] });

@@ -84,7 +84,7 @@ angular.module('tabitha').compileProvider.directive('gbJsplumb', ['$timeout','js
 
             // Redraw jsPlumb when the parents change. Timeout so that it updates the angular stuff first.
             $timeout(function() {
-                jsPlumbService.activate(elemId, 'cardType');
+                jsPlumbService.activate(elemId);
             });
             
         }

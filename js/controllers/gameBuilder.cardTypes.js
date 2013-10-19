@@ -1,7 +1,7 @@
 angular.module('tabitha').controllerProvider.register('cardTypes', ['$scope', '$timeout', 'jsPlumbService', function($scope, $timeout, jsPlumbService) {
 	$scope.currentCardType = null;
 	$scope.jsPlumb = jsPlumbService;
-	jsPlumbService.setDefaults();
+	$scope.toolbox.cardTypeTools = {};
 
 	$scope.defaults.defaultCardType.prototype.setCardParent = function(index) {
         if(index === undefined)
@@ -80,22 +80,54 @@ angular.module('tabitha').controllerProvider.register('cardTypes', ['$scope', '$
 			]
 		}
 	];
-	$scope.toolbox.cardTypeTools = {
-		cardType: {
-			name: 'Card Type',
-			color: 'red',
-			inputsFrom: [
-				'cardType'
-			],
-			fieldOptions: commonFields
-		},
-		conditional: {
-			name: 'Conditional Card Type',
-			color: 'blue',
-			inputsFrom: [
-				'cardType'
-			],
-			fieldOptions: commonFields
-		}
+	$scope.toolbox.cardTypeTools['cardType'] = {
+		name: 'Card Type',
+		color: 'red',
+		inputsFrom: [
+			'cardType',
+			'conditional'
+		],
+		fieldOptions: commonFields,
+		sourceAnchors: [
+			{
+				placement: "BottomCenter",
+				handler: function(module) {
+					
+				}
+			}
+		],
+		targetAnchors: [
+			{
+				placement: "TopCenter",
+				handler: function(module) {
+					
+				}
+			}
+		]
 	}
+	$scope.toolbox.cardTypeTools['conditional'] = {
+		name: 'Card Conditional',
+		color: 'blue',
+		inputsFrom: [
+			'cardType'
+		],
+		fieldOptions: commonFields,
+		sourceAnchors: [
+			{
+				placement: "BottomCenter",
+				handler: function(module) {
+					console.log(this)
+				}
+			}
+		],
+		targetAnchors: [
+			{
+				placement: "TopCenter",
+				handler: function(module) {
+					
+				}
+			}
+		]
+	}
+	jsPlumbService.setDefaults('cardType',$scope.toolbox.cardTypeTools);
 }]);
